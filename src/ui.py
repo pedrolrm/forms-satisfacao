@@ -109,7 +109,7 @@ def renderizar_respostas_textuais(df_filtrado):
     st.dataframe(
         respostas,
         hide_index=True,
-        use_container_width=True,
+        width='stretch',
         column_config={
             "Membro": st.column_config.TextColumn("Membro", width="medium"),
             "Resposta": st.column_config.TextColumn("Resposta", width="large"),

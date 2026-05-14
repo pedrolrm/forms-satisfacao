@@ -138,7 +138,7 @@ with st.container():
                 st.dataframe(
                     contagem,
                     hide_index=True,
-                    use_container_width=True,
+                    width='stretch',
                     column_config={
                         "Resposta": st.column_config.TextColumn("Resposta", width="large"),
                         "Quantidade": st.column_config.NumberColumn("Quantidade", width="small"),
