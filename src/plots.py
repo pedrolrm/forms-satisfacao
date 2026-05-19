@@ -92,6 +92,10 @@ def titulo_coluna(coluna):
 
 
 def plot_media(pergunta, df, coluna_nucleo="nucleo"):
+    if df.empty:
+        st.info("Não há dados para o recorte selecionado.")
+        return None
+
     media = df.groupby(coluna_nucleo, as_index=False)[pergunta].mean()
     media = media.sort_values(pergunta)
 
@@ -116,6 +120,10 @@ def plot_media(pergunta, df, coluna_nucleo="nucleo"):
 
 
 def plot_boxplot(pergunta, df, coluna_nucleo="nucleo", coluna_nome="nome"):
+    if df.empty:
+        st.info("Não há dados para o recorte selecionado.")
+        return None
+
     media = df.groupby(coluna_nucleo)[pergunta].mean().sort_values()
     hover_data = _colunas_presentes(df, [coluna_nome])
 
@@ -144,6 +152,10 @@ def plot_boxplot(pergunta, df, coluna_nucleo="nucleo", coluna_nome="nome"):
 
 
 def plot_heatmap_medias(df, colunas_escala, coluna_nucleo="nucleo"):
+    if df.empty:
+        st.info("Não há dados para o recorte selecionado.")
+        return None
+
     medias = df.groupby(coluna_nucleo)[colunas_escala].mean()
     medias = medias.sort_index()
     medias.columns = [titulo_coluna(coluna) for coluna in medias.columns]
@@ -171,6 +183,10 @@ def plot_heatmap_medias(df, colunas_escala, coluna_nucleo="nucleo"):
 
 
 def plot_ranking_perguntas(df, colunas_escala):
+    if df.empty:
+        st.info("Não há dados para o recorte selecionado.")
+        return None
+
     medias = df[colunas_escala].mean().sort_values().reset_index()
     medias.columns = ["pergunta", "media"]
     medias["pergunta"] = medias["pergunta"].map(titulo_coluna)
@@ -196,6 +212,10 @@ def plot_ranking_perguntas(df, colunas_escala):
 
 
 def plot_distribuicao_notas(df, colunas_escala):
+    if df.empty:
+        st.info("Não há dados para o recorte selecionado.")
+        return None
+
     df_longo = df[colunas_escala].melt(var_name="pergunta", value_name="nota")
     df_longo["pergunta"] = df_longo["pergunta"].map(titulo_coluna)
 
@@ -222,6 +242,10 @@ def plot_distribuicao_notas(df, colunas_escala):
 
 def plot_radar_nucleo(df, colunas_escala, nucleo, coluna_nucleo="nucleo"):
     df_nucleo = df[df[coluna_nucleo] == nucleo]
+    if df_nucleo.empty:
+        st.info("Não há dados para o núcleo selecionado.")
+        return None
+
     medias = df_nucleo[colunas_escala].mean()
 
     fig = go.Figure()
@@ -258,6 +282,10 @@ def plot_radar_nucleo(df, colunas_escala, nucleo, coluna_nucleo="nucleo"):
 
 
 def plot_respostas_categoricas(df, coluna):
+    if df.empty:
+        st.info("Não há dados para o recorte selecionado.")
+        return None
+
     contagem = df[coluna].value_counts(dropna=False).reset_index()
     contagem.columns = [coluna, "quantidade"]
     contagem = contagem.sort_values("quantidade", ascending=True)
