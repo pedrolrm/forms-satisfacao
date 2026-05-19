@@ -16,7 +16,7 @@ from src.plots import (
 from src.styles import aplicar_estilos
 from src.ui import (
     renderizar_cabecalho_texto,
-    renderizar_filtro_nucleo,
+    renderizar_filtros,
     renderizar_logo_topo,
     renderizar_metricas_principais,
     renderizar_respostas_textuais,
@@ -53,11 +53,24 @@ if "nucleo_selecionado" not in st.session_state:
 if st.session_state.nucleo_selecionado not in nucleos_disponiveis:
     st.session_state.nucleo_selecionado = "Todos"
 
+df_opcoes_membro = (
+    df
+    if st.session_state.nucleo_selecionado == "Todos"
+    else df[df["nucleo"] == st.session_state.nucleo_selecionado]
+)
+membros_disponiveis = ["Todos"] + sorted(df_opcoes_membro["nome"].dropna().unique().tolist())
+
+if "membro_selecionado" not in st.session_state:
+    st.session_state.membro_selecionado = "Todos"
+
+if st.session_state.membro_selecionado not in membros_disponiveis:
+    st.session_state.membro_selecionado = "Todos"
+
 botao, titulo, logo = st.columns([0.045, 0.855, 0.10], vertical_alignment="top")
 with botao:
     st.markdown('<div class="cjr-filter-button">', unsafe_allow_html=True)
     with st.popover("≡", help="Abrir filtros"):
-        renderizar_filtro_nucleo(nucleos_disponiveis)
+        renderizar_filtros(nucleos_disponiveis, membros_disponiveis)
     st.markdown("</div>", unsafe_allow_html=True)
 with titulo:
     renderizar_cabecalho_texto()
@@ -67,10 +80,24 @@ with logo:
 st.markdown('<div class="cjr-topbar-line"></div>', unsafe_allow_html=True)
 
 nucleo_selecionado = st.session_state.nucleo_selecionado
+membro_selecionado = st.session_state.membro_selecionado
 
 df_filtrado = df if nucleo_selecionado == "Todos" else df[df["nucleo"] == nucleo_selecionado]
+df_filtrado = (
+    df_filtrado
+    if membro_selecionado == "Todos"
+    else df_filtrado[df_filtrado["nome"] == membro_selecionado]
+)
 
 with st.container():
+    recorte = []
+    if nucleo_selecionado != "Todos":
+        recorte.append(f"Núcleo: {nucleo_selecionado}")
+    if membro_selecionado != "Todos":
+        recorte.append(f"Membro: {membro_selecionado}")
+    if recorte:
+        st.caption(" | ".join(recorte))
+
     renderizar_metricas_principais(df_filtrado, colunas_escala)
 
     tab_geral, tab_pergunta, tab_nucleo, tab_categoricas, tab_textuais = st.tabs(
@@ -109,14 +136,17 @@ with st.container():
             plot_boxplot(pergunta_selecionada, df_filtrado)
 
     with tab_nucleo:
-        nucleos_radar = sorted(df["nucleo"].dropna().unique().tolist())
+        nucleos_radar = sorted(df_filtrado["nucleo"].dropna().unique().tolist())
         nucleo_radar = (
             st.selectbox("Núcleo para análise", nucleos_radar)
-            if nucleo_selecionado == "Todos"
+            if nucleo_selecionado == "Todos" and nucleos_radar
             else nucleo_selecionado
         )
 
-        plot_radar_nucleo(df, colunas_escala, nucleo_radar)
+        if nucleo_radar:
+            plot_radar_nucleo(df_filtrado, colunas_escala, nucleo_radar)
+        else:
+            st.info("Não há núcleo disponível para o recorte selecionado.")
 
     with tab_categoricas:
         if not colunas_categoricas:

@@ -46,15 +46,16 @@ def renderizar_logo_topo():
     )
 
 
-def renderizar_filtro_nucleo(nucleos_disponiveis):
+def renderizar_filtros(nucleos_disponiveis, membros_disponiveis):
     st.markdown(
         """
         <div class="cjr-popover-title">Filtros</div>
-        <div class="cjr-popover-subtitle">Recorte os dados por núcleo.</div>
+        <div class="cjr-popover-subtitle">Recorte os dados por núcleo ou membro.</div>
         """,
         unsafe_allow_html=True,
     )
-    return st.selectbox("Núcleo", nucleos_disponiveis, key="nucleo_selecionado")
+    st.selectbox("Núcleo", nucleos_disponiveis, key="nucleo_selecionado")
+    st.selectbox("Membro", membros_disponiveis, key="membro_selecionado")
 
 
 def renderizar_metricas_principais(df_filtrado, colunas_escala):
